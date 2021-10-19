@@ -1,5 +1,5 @@
 const AttackCalc = require('./damageCalc.js');
-const processInput = require('./processInput.js');
+const processInput = require('./processCalcInput.js');
 const Info = require('./info.json');
 
 function runTest(){

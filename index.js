@@ -1,10 +1,11 @@
 const {Client, Intents} = require("discord.js");
 const fetch = require("node-fetch");
-const processInput = require('./processInput.js');
+const processCalcInput = require('./commands/calc/processCalcInput');
 require("dotenv").config();
 
 // global vars
 const token = process.env.BOT_TOKEN;
+const command_symbol = '!!';
 
 // init
 const bot_intents = new Intents();
@@ -14,8 +15,6 @@ bot_intents.add(
   Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
   Intents.FLAGS.DIRECT_MESSAGES);
 const client = new Client({intents:bot_intents});
-
-let a = 1; // test variables
 
 // functions 
 function getQuote(){
@@ -40,12 +39,12 @@ client.on("messageCreate", (message) => {
   
   // check if the first word is a command
   // commands begin with '!!'
-  if (message.content.substring(0,2) == '!!'){
+  if (message.content.substring(0,2) == command_symbol){
     let argv = message.content.split(' ');
     if (argv[0].substring(2) == 'calc'){
       argv.shift()
-      let result = processInput.processInput(argv).result;
-      let err = processInput.processInput(argv).curr_err;
+      let result = processCalcInput.processInput(argv).result;
+      let err = processCalcInput.processInput(argv).curr_err;
       for (let i = 0; i < err.length; i++){
         result = result + "\n" + err[i];
       }
@@ -53,7 +52,6 @@ client.on("messageCreate", (message) => {
     }
 
     if (argv[0].substring(2) == 'quote'){
-      console.log(getQuote());
       "Quote: " + getQuote().then(quote => message.channel.send(quote));
     }
   }
