@@ -1,10 +1,10 @@
 const {Client, Intents} = require("discord.js");
 const fetch = require("node-fetch");
-const process = require('./processInput.js');
-const token_file = require('./token.json')
+const processInput = require('./processInput.js');
+require("dotenv").config();
 
 // global vars
-const token = token_file.token;
+const token = process.env.BOT_TOKEN;
 
 // init
 const bot_intents = new Intents();
@@ -24,17 +24,15 @@ function getQuote(){
       return res.json();
     })
     .then(data => {
-      console.log(data)
       return data[0].q + "-" + data[0].a;
     })
 }
 
 
-
 // listeners
 
 client.on("ready", () => {
-  console.log("test hello world:" + client.user.tag);
+  console.log("test hello world: " + client.user.tag);
 });
 
 client.on("messageCreate", (message) => {
@@ -46,9 +44,8 @@ client.on("messageCreate", (message) => {
     let argv = message.content.split(' ');
     if (argv[0].substring(2) == 'calc'){
       argv.shift()
-      console.log(argv)
-      let result = process.processInput(argv).result;
-      let err = process.processInput(argv).curr_err;
+      let result = processInput.processInput(argv).result;
+      let err = processInput.processInput(argv).curr_err;
       for (let i = 0; i < err.length; i++){
         result = result + "\n" + err[i];
       }

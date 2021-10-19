@@ -1,5 +1,5 @@
 const AttackCalc = require('./damageCalc.js');
-const process = require('./processInput.js');
+const processInput = require('./processInput.js');
 const Info = require('./info.json');
 
 function runTest(){
@@ -29,7 +29,7 @@ function runTest(){
   // console.log(process.processInput(teststring2));
 
   let teststring3 = "dog0.1 soldier76 1 9".split(' ');
-  console.log(process.processInput(teststring3));
+  console.log(processInput.processInput(teststring3));
   
 }
 
