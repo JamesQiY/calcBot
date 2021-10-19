@@ -2,8 +2,9 @@
 Experimental bot. Very dangerous (aka buggy)
 
 ## supported commands
--!!quote
--!!calc
+- !!quote : gives a random quote
+- !!calc : usage attacker[hp] defender[hp] att_terrain def_terrain [c]
 
 #### Author
-James Qi Y.
+James Y.
+Andy Z
