@@ -25,13 +25,17 @@ function processAttack (attacker, defender, critical=false, weather='sunny', rng
     return damage;
   }
   
+  // used 
+  let def_multi = (1 - (defender_health * terrain_multi));
+  if (terrain_multi < 0) def_multi = (1 - (terrain_multi));
+
   
   damage.low = ((power * crit_multi * weather_multi) + rand_low);
-  damage.low = damage.low * attacker_health * (1 - (defender_health * terrain_multi))
+  damage.low = damage.low * attacker_health * def_multi;
   damage.low = damage.low <= 0 ? 0: damage.low.toFixed(2);
 
   damage.high = ((power * crit_multi * weather_multi) + rand_high)
-  damage.high = damage.high *  attacker_health * (1 - (defender_health * terrain_multi))
+  damage.high = damage.high *  attacker_health * def_multi;
   damage.high = damage.high <= 0 ? 0: damage.high.toFixed(2);
 
   damage.median = ((power * crit_multi * weather_multi))
