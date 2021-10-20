@@ -1,5 +1,10 @@
 const AttackCalc = require('./damageCalc.js');
 const Info = require('./info.json');
+const {MessageEmbed, MessageAttachment} = require("discord.js");
+
+
+const calc_color = '#fff545';
+const sword_image = new MessageAttachment('images/sword.png');
 
 // array of strings to keep track of error messages to output
 var err = [];
@@ -7,32 +12,61 @@ var err = [];
 // need to process something like
 // soldier100 soldier50 ta=1 td=2 c=false 
 // input is an array of parameters 
-function processInput(input) {
-  var valid = validate(input);
-  let result = {};
-  let curr_err = []
-  if (!valid.check) { // if the input does not pass the checks
-    for (let i = 0; i < err.length; i++) {
-      console.log(err[i]);
-    }
-    result = processResults(result);
-    curr_err = err;
-    err = []
+function getEmbed(input) {
+  const valid = validate(input);
+  let result = "";
+  if (!valid.check || err.length > 0) { // if the input does not pass the checks
+    result = formatCalcEmbed(result, err, valid);
   } else { // if the input does pass all the checks
-    let attacker = valid.output.attacker;
-    let defender = valid.output.defender;
-    let has_crit = valid.output.crit;
-    result = AttackCalc.processAttack(attacker, defender, has_crit);
-    result = processResults(result, attacker, defender);
+    let attacker = valid.unit.attacker;
+    let defender = valid.unit.defender;
+    let has_crit = valid.unit.crit;
+    let damage_calc = AttackCalc.processAttack(attacker, defender, has_crit);
+    result = formatCalcEmbed(damage_calc, err, valid, has_crit);
   }
-  return {result, curr_err};
+  return {embeds: [result], files: [sword_image]};
+}
+
+function formatCalcEmbed(calc, err=[], valid={check: false}, crit=false){
+  // init for embed
+  const embed = new MessageEmbed()
+	.setColor(calc_color)
+	.setTitle("Damage Calculation")
+	// .addField('Title', 'Some value here', true)
+  .setThumbnail('attachment://sword.png')
+	.setTimestamp()
+	.setFooter('use !!manCalc for more info. Bot by jams');
+
+  if (err.length > 0 || !valid.check){ // calc had error
+    embed.setDescription("error occured");
+    for(const error_message of err){
+      embed.addFields({name: 'ERROR:', value: error_message});
+    }
+  } else {
+    const unit = valid.unit;
+    const attacker = unit.attacker;
+    const defender = unit.defender;
+    let desc = "Calculated\n";
+    if (crit) desc = desc + "**Critical hit**\n";
+    desc += attacker.health + " hp " + attacker.name + " vs ";
+    desc += defender.health + " hp " + defender.name;
+    desc += " on terrain value of " + defender.terrain;
+
+    
+    embed.setDescription(desc);
+    let battle = bolded(attacker.name) + " vs " + bolded(defender.name);
+    let battle_damage = "Median: " + bolded(calc.median) + "\n"; 
+    battle_damage = battle_damage + calc.low + " - " + calc.high; 
+    embed.addFields({name: battle, value: battle_damage});
+  }
+  return embed;
 }
 
 function validate(input) {
   let check = true;
-  let output = {};
-  // valid command requires at least 4 parameters
-  if (input.length >= 4) {
+  let unit = {};
+  // valid command requires at least 2 parameters
+  if (input.length >= 2) {
 
     // unit checks
     let attacker = input[0];
@@ -45,10 +79,8 @@ function validate(input) {
     // regex matches 'a=' or 'd='(option) and then integers between '-2' to '4'
     let att_terrain_regex = /^(a=)(-[1-2]|[0-4])$/gm;
     let def_terrain_regex = /^(d=)?(-[1-2]|[0-4])$/gm;
-    let att_terrain = "";
-    let def_terrain = "";
-
-    // ['spray', 'limit', 'elite', 'exuberant', 'destruction', 'present'];
+    let att_terrain = "0";
+    let def_terrain = "1";
 
     let terrain_matches = input.filter(parameter => att_terrain_regex.test(parameter));
     if (terrain_matches.length == 1){
@@ -59,8 +91,7 @@ function validate(input) {
     if (terrain_matches.length == 1){
       def_terrain = terrain_matches[0];
     }
-    // console.log(att_terrain, typeof att_terrain)
-    check = check && checkTerrain(att_terrain, "attacker");
+
     check = check && checkTerrain(def_terrain, "defender");
 
     // crit check
@@ -68,13 +99,15 @@ function validate(input) {
     if (input.includes('c')) crit = true;
 
     if (check) {
-      output.attacker = processUnit(attacker, att_terrain);
-      output.defender = processUnit(defender, def_terrain);
-      output.crit = crit;
+      unit.attacker = processUnit(attacker, att_terrain);
+      unit.defender = processUnit(defender, def_terrain);
+      unit.crit = crit;
     }
+  } else {
+    check = false;
+    err.push("there are fewer than 3 required arguments (attacker, defender, defender terrain)");
   }
-
-  return {check, output};
+  return {check, unit: unit};
 }
 
 // input: 
@@ -86,6 +119,8 @@ function checkUnit(unit, side) {
 
   if (unit.search(/\d/) > 0) {
     let unit_name = unit.substring(0, unit.search(/\d/));
+    unit_name = translate(unit_name);
+    console.log(unit_name);
     if (valid_units.includes(unit_name)) {
       let unit_health = unit.substring(unit.search(/\d/), unit.length);
       if (!isNaN(unit_health)) {
@@ -100,21 +135,41 @@ function checkUnit(unit, side) {
     } else {
       err.push(side + " name is wrong or does not exist");
     }
-  } else if (valid_units.includes(unit)) {
+  } else if (valid_units.includes(translate(unit))) {
     return true;
+  } else {
+    err.push(side + " name is wrong or does not exist");
   }
   return false;
+}
+
+function translate(input_name){
+  let name = input_name;
+  switch(name.toLowerCase()){
+    case 'sword': name = 'soldier'; break;
+    case 'treb' : name = 'trebuchet'; break;
+    case 'golem' : name = 'giant'; break;
+    case 'knight' : name = 'cavalry'; break;
+    case 'spear' : name = 'spearman'; break;
+    case 'witch' : name = 'skyrider'; break;
+    case 'harp' || 'harpoon': name = 'harpoonship'; break;
+    case 'merfolk': name = 'amphibian'; break;
+    case 'rifle': name = 'rifleman'; break;
+    case 'village': name = 'building'; break;
+    case 'co' || 'com': name = 'commander'; break;
+  }
+  return name;
 }
 
 function processUnit(unit, terrain_string) {
   let unit_name = "";
   let unit_health = 0;
   if (unit.search(/\d/) > 0) { // if you find a number after name
-    unit_name = unit.substring(0, unit.search(/\d/));
+    unit_name =  translate(unit.substring(0, unit.search(/\d/)));
     unit_health = unit.substring(unit.search(/\d/), unit.length);
     unit_health = parseInt(unit_health);
   } else { // if you dont find a number, health = 100
-    unit_name = unit;
+    unit_name = translate(unit);
     unit_health = 100;
   }
 
@@ -124,7 +179,6 @@ function processUnit(unit, terrain_string) {
 
 function checkTerrain(terrain, side) {
   let index = terrain.indexOf('=') + 1;
-  // console.log(terrain, index);
   terrain = terrain.substring(index);
 
   if (!isNaN(terrain)) {
@@ -139,22 +193,6 @@ function checkTerrain(terrain, side) {
   return false;
 }
 
-// result: valid = {low:, high:}, invalid: {}
-function processResults(result, attacker={name: ""}, defender={name: ""}){
-  output_string = "";
-  if (Object.keys(result).length == 0){
-    output_string = "The inputs had an issue, check your inputs again";
-    printMan();
-  } else {
-    output_string = attacker.name + " will do " + result.low + " to " + result.high + " against " + defender.name + ". Median " + result.median; 
-  }
-  return output_string;
-}
+function bolded(string) { return "**" + string + "**"; }
 
-function printMan(){
-  man_string = "Usage: attacker[hp] defender[hp] att_terrain def_terrain [c]\n";
-  man_string = man_string + "attacker[hp]: the attacking unit's name and its hp. if no hp is given, 100 is used.";
-  return man_string;
-}
-
-exports.processInput = processInput;
+exports.getEmbed = getEmbed;

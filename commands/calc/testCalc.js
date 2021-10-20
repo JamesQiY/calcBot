@@ -28,7 +28,7 @@ function runTest(){
   // let teststring2 = "soldier dog 1 4 c".split(' ');
   // console.log(process.processInput(teststring2));
 
-  let teststring3 = "dog100 soldier a=1 3".split(' ');
+  let teststring3 = "dog soldier 3".split(' ');
   console.log(processInput.processInput(teststring3));
   
 }

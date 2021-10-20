@@ -1,11 +1,13 @@
-const {Client, Intents} = require("discord.js");
+const {Client, Intents, MessageEmbed, MessageAttachment} = require("discord.js");
 const fetch = require("node-fetch");
 const processCalcInput = require('./commands/calc/processCalcInput');
+const help = require('./commands/help/help');
 require("dotenv").config();
 
 // global vars
 const token = process.env.BOT_TOKEN;
-const command_symbol = '!!';
+const command_symbol = '!';
+
 
 // init
 const bot_intents = new Intents();
@@ -27,6 +29,17 @@ function getQuote(){
     })
 }
 
+function embedBuilder(title='', desc=""){
+  const embed = new MessageEmbed()
+	.setColor('#ff4545')
+	.setTitle(title)
+	.setDescription(desc)
+	// .addField('Title', 'Some value here', true)
+  .setThumbnail('attachment://skull.png')
+	.setTimestamp()
+	.setFooter('Some footer text here');
+  return embed;
+}
 
 // listeners
 
@@ -39,20 +52,27 @@ client.on("messageCreate", (message) => {
   
   // check if the first word is a command
   // commands begin with '!!'
-  if (message.content.substring(0,2) == command_symbol){
+  if (message.content.substring(0,command_symbol.length) == command_symbol){
     let argv = message.content.split(' ');
-    if (argv[0].substring(2) == 'calc'){
-      argv.shift()
-      let result = processCalcInput.processInput(argv).result;
-      let err = processCalcInput.processInput(argv).curr_err;
-      for (let i = 0; i < err.length; i++){
-        result = result + "\n" + err[i];
-      }
-      message.channel.send(result);
-    }
-
-    if (argv[0].substring(2) == 'quote'){
-      "Quote: " + getQuote().then(quote => message.channel.send(quote));
+    var command = argv[0].substring(command_symbol.length);
+    console.log("processing " + command);
+    switch(command){
+      case "calc":
+        argv.shift()
+        let result = processCalcInput.getEmbed(argv);
+        message.channel.send(result);
+        break;
+      case "quote":
+        "Quote: " + getQuote().then(quote => message.channel.send(quote));
+        break;
+      case "help":
+        message.channel.send(help.getHelpEmbed());
+        break;
+      case "manCalc":
+        message.channel.send(help.getManEmbed());
+        break;
+      default:
+        message.channel.send("invalid command, try again.");
     }
   }
 });
