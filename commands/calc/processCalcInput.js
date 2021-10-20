@@ -120,7 +120,6 @@ function checkUnit(unit, side) {
   if (unit.search(/\d/) > 0) {
     let unit_name = unit.substring(0, unit.search(/\d/));
     unit_name = translate(unit_name);
-    console.log(unit_name);
     if (valid_units.includes(unit_name)) {
       let unit_health = unit.substring(unit.search(/\d/), unit.length);
       if (!isNaN(unit_health)) {

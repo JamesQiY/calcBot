@@ -44,7 +44,7 @@ function embedBuilder(title='', desc=""){
 // listeners
 
 client.on("ready", () => {
-  console.log("test hello world: " + client.user.tag);
+  console.log("bot ready: " + client.user.tag);
 });
 
 client.on("messageCreate", (message) => {
@@ -55,7 +55,6 @@ client.on("messageCreate", (message) => {
   if (message.content.substring(0,command_symbol.length) == command_symbol){
     let argv = message.content.split(' ');
     var command = argv[0].substring(command_symbol.length);
-    console.log("processing " + command);
     switch(command){
       case "calc":
         argv.shift()
