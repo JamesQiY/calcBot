@@ -41,9 +41,25 @@ function validate(input) {
     check = check && checkUnit(defender, "defender");
 
     // terrain checks
-    let att_terrain = input[2];
-    let def_terrain = input[3];
+    
+    // regex matches 'a=' or 'd='(option) and then integers between '-2' to '4'
+    let att_terrain_regex = /^(a=)(-[1-2]|[0-4])$/gm;
+    let def_terrain_regex = /^(d=)?(-[1-2]|[0-4])$/gm;
+    let att_terrain = "";
+    let def_terrain = "";
 
+    // ['spray', 'limit', 'elite', 'exuberant', 'destruction', 'present'];
+
+    let terrain_matches = input.filter(parameter => att_terrain_regex.test(parameter));
+    if (terrain_matches.length == 1){
+      att_terrain = terrain_matches[0];
+    }
+
+    terrain_matches = input.filter(parameter => def_terrain_regex.test(parameter));
+    if (terrain_matches.length == 1){
+      def_terrain = terrain_matches[0];
+    }
+    // console.log(att_terrain, typeof att_terrain)
     check = check && checkTerrain(att_terrain, "attacker");
     check = check && checkTerrain(def_terrain, "defender");
 
@@ -107,11 +123,15 @@ function processUnit(unit, terrain_string) {
 }
 
 function checkTerrain(terrain, side) {
+  let index = terrain.indexOf('=') + 1;
+  // console.log(terrain, index);
+  terrain = terrain.substring(index);
+
   if (!isNaN(terrain)) {
     if (parseInt(terrain) >= -2 && parseInt(terrain) <= 4) {
       return true;
     } else {
-      err.push(side + " terrain is invalid. Usage: -2 to 4");
+      err.push(side + " terrain is out of range. Usage: -2 to 4");
     }
   } else {
     err.push(side + "terrain is invalid. Usage: -2 to 4");
@@ -120,7 +140,7 @@ function checkTerrain(terrain, side) {
 }
 
 // result: valid = {low:, high:}, invalid: {}
-function processResults(result, attacker={}, defender={}){
+function processResults(result, attacker={name: ""}, defender={name: ""}){
   output_string = "";
   if (Object.keys(result).length == 0){
     output_string = "The inputs had an issue, check your inputs again";
