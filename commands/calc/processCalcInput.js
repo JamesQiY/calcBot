@@ -35,7 +35,7 @@ function formatCalcEmbed(calc, err=[], valid={check: false}, crit=false){
 	// .addField('Title', 'Some value here', true)
   .setThumbnail('attachment://sword.png')
 	.setTimestamp()
-	.setFooter('use !!manCalc for more info. Bot by jams');
+	.setFooter('use !manCalc for more info. Bot by jams');
 
   if (err.length > 0 || !valid.check){ // calc had error
     embed.setDescription("error occured");
