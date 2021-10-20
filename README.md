@@ -2,9 +2,10 @@
 Experimental bot. Very dangerous (aka buggy)
 
 ## supported commands
-- !!quote : gives a random quote
-- !!calc : usage attacker[hp] defender[hp] att_terrain def_terrain [c]
+- !quote : gives a random quote
+- !calc : calculates wargroove battle damage given input
+- !manCalc : manual page of !calc
 
 #### Author
 James Y.
-Andy Z
+Andy Z.
