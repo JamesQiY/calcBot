@@ -17,6 +17,7 @@ function getEmbed(input) {
   let result = "";
   if (!valid.check || err.length > 0) { // if the input does not pass the checks
     result = formatCalcEmbed(result, err, valid);
+    err = [];
   } else { // if the input does pass all the checks
     let attacker = valid.unit.attacker;
     let defender = valid.unit.defender;
