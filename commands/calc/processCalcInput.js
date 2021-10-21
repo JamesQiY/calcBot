@@ -84,13 +84,15 @@ function validate(input) {
 
     let terrain_matches = input.filter(parameter => att_terrain_regex.test(parameter));
     if (terrain_matches.length == 1){
-      att_terrain = terrain_matches[0];
+      let index = terrain_matches[0].indexOf('=') + 1;
+      att_terrain = terrain_matches[0].substring(index);
       check = check && checkTerrain(att_terrain, "attacker");
     }
 
     terrain_matches = input.filter(parameter => def_terrain_regex.test(parameter));
     if (terrain_matches.length == 1){
-      def_terrain = terrain_matches[0];
+      let index = terrain_matches[0].indexOf('=') + 1;
+      def_terrain = terrain_matches[0].substring(index);
       check = check && checkTerrain(def_terrain, "defender");
     }
 
