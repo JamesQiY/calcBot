@@ -19,18 +19,37 @@ function runTest(){
 
   // test 1
   console.log(AttackCalc.processAttack(attacker, defender, true));
+  console.log(AttackCalc.processAttack(attacker, defender, false));
+  console.log(AttackCalc.processAttack({}, defender, false));
+  console.log(AttackCalc.processAttack({}, {}, false));
 
-  // // test 2
-  // let teststring1 = "soldier75 dog60 1 4 c".split(' ');
-  // console.log(process.processInput(teststring1));
-  
-  // test 3
-  // let teststring2 = "soldier dog 1 4 c".split(' ');
-  // console.log(process.processInput(teststring2));
+  let teststrings = [
+    "soldier100 dog100",
+    "soldier dog",
+    "soldier dog 0",
+    "soldier dog -1",
+    "soldier dog -3",
+    "soldier dog 4",
+    "soldier dog 5",
+    "soldier0 dog0.1 ",
+    "soldier dog0",
+    "soldierdog 0",
+    "soldier50 dog50 0",
+    "soldier dog 0 c",
+    "sword sword 0",
+    "sword dog a=1",
+    "sword dog a=1 d=1",
+    "sword dog a=6 d=1",
+    "sword dog a=1 d=5",
+    "sword dog a=0 d=-1",
+    "sword dog a=6 d=1 c"
+  ]
 
-  let teststring3 = "dog soldier 3".split(' ');
-  console.log(processInput.processInput(teststring3));
-  
+  for (test of teststrings){
+    const string = test;
+    test = test.split(' ');
+    console.log(string, processInput.validate(test).check);
+  }
 }
 
 runTest();

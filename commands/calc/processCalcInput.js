@@ -77,22 +77,22 @@ function validate(input) {
     // terrain checks
     
     // regex matches 'a=' or 'd='(option) and then integers between '-2' to '4'
-    let att_terrain_regex = /^(a=)(-[1-2]|[0-4])$/gm;
-    let def_terrain_regex = /^(d=)?(-[1-2]|[0-4])$/gm;
+    let att_terrain_regex = /^(a=)(-[1-9]|[0-9])$/gm;
+    let def_terrain_regex = /^(d=)?(-[1-9]|[0-9])$/gm;
     let att_terrain = "0";
     let def_terrain = "1";
 
     let terrain_matches = input.filter(parameter => att_terrain_regex.test(parameter));
     if (terrain_matches.length == 1){
       att_terrain = terrain_matches[0];
+      check = check && checkTerrain(att_terrain, "attacker");
     }
 
     terrain_matches = input.filter(parameter => def_terrain_regex.test(parameter));
     if (terrain_matches.length == 1){
       def_terrain = terrain_matches[0];
+      check = check && checkTerrain(def_terrain, "defender");
     }
-
-    check = check && checkTerrain(def_terrain, "defender");
 
     // crit check
     let crit = false;
@@ -195,3 +195,4 @@ function checkTerrain(terrain, side) {
 function bolded(string) { return "**" + string + "**"; }
 
 exports.getEmbed = getEmbed;
+exports.validate = validate;
