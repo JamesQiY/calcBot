@@ -42,13 +42,15 @@ function runTest(){
     "sword dog a=6 d=1",
     "sword dog a=1 d=5",
     "sword dog a=0 d=-1",
-    "sword dog a=6 d=1 c"
+    "sword dog a=6 d=1 c",
+    "dog25 co15 d=4 a=2 c",
+    "dog soldier"
   ]
 
   for (test of teststrings){
     const string = test;
     test = test.split(' ');
-    console.log(string, processInput.validate(test).check);
+    console.log(string, processInput.validate(test));
   }
 }
 

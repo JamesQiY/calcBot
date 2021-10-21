@@ -42,6 +42,7 @@ function formatCalcEmbed(calc, err=[], valid={check: false}, crit=false){
     for(const error_message of err){
       embed.addFields({name: 'ERROR:', value: error_message});
     }
+    err = [];
   } else {
     const unit = valid.unit;
     const attacker = unit.attacker;
@@ -52,7 +53,6 @@ function formatCalcEmbed(calc, err=[], valid={check: false}, crit=false){
     desc += defender.health + " hp " + defender.name;
     desc += " on terrain value of " + defender.terrain;
 
-    
     embed.setDescription(desc);
     let battle = bolded(attacker.name) + " vs " + bolded(defender.name);
     let battle_damage = "Median: " + bolded(calc.median) + "\n"; 
