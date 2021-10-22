@@ -1,22 +1,37 @@
 const {Client, Intents, MessageEmbed, MessageAttachment} = require("discord.js");
+const tmi = require('tmi.js');
+
 const fetch = require("node-fetch");
 const processCalcInput = require('./commands/calc/processCalcInput');
 const help = require('./commands/help/help');
 require("dotenv").config();
 
 // global vars
-const token = process.env.BOT_TOKEN;
+const discord_token = process.env.BOT_TOKEN;
 const command_symbol = '!';
 
 
 // init
+// DISCORD BOT
 const bot_intents = new Intents();
 bot_intents.add(
   Intents.FLAGS.GUILDS,
   Intents.FLAGS.GUILD_MESSAGES, 
   Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
   Intents.FLAGS.DIRECT_MESSAGES);
-const client = new Client({intents:bot_intents});
+const discord_client = new Client({intents:bot_intents});
+
+// TWITCH BOT
+const opts = {
+  identity: {
+    username: process.env.BOT_USERNAME,
+    password: process.env.OAUTH_TOKEN
+  },
+  channels: [
+    process.env.CHANNEL_NAME
+  ]
+};
+const twitch_client = new tmi.client(opts);
 
 // functions 
 function getQuote(){
@@ -29,31 +44,27 @@ function getQuote(){
     })
 }
 
-function embedBuilder(title='', desc=""){
-  const embed = new MessageEmbed()
-	.setColor('#ff4545')
-	.setTitle(title)
-	.setDescription(desc)
-	// .addField('Title', 'Some value here', true)
-  .setThumbnail('attachment://skull.png')
-	.setTimestamp()
-	.setFooter('Some footer text here');
-  return embed;
+// listeners
+discord_client.on("ready", onConnectedDiscord);
+discord_client.on("messageCreate", onMessageDiscord);
+
+twitch_client.on('message', onMessageTwitch);
+twitch_client.on('connected', onConnectedTwitch);
+
+
+function onConnectedDiscord(){
+  console.log("DISCORD bot ready: " + discord_client.user.tag);
 }
 
-// listeners
-
-client.on("ready", () => {
-  console.log("bot ready: " + client.user.tag);
-});
-
-client.on("messageCreate", (message) => {
+// bot sends message depending on command given
+// input: discord message object
+// output: none
+function onMessageDiscord(message){
   if (message.author.bot) return false; 
   
   // check if the first word is a command
-  // commands begin with '!!'
   if (message.content.substring(0,command_symbol.length) == command_symbol){
-    let argv = message.content.split(' ');
+    let argv = message.content.trim().split(' ');
     var command = argv[0].substring(command_symbol.length);
     switch(command){
       case "calc":
@@ -73,8 +84,48 @@ client.on("messageCreate", (message) => {
       default:
         message.channel.send("invalid command, try again.");
     }
+    console.log(`* Discord: Executed ${command} command`);
   }
-});
+}
 
 
-client.login(token);
+
+function onMessageTwitch (target, context, msg, self) {
+  if (self) { return; } // Ignore messages from the bot
+
+  // Remove whitespace from chat message
+  let argv = msg.trim().split(' ');
+  var command = argv[0].substring(command_symbol.length);
+  switch(command){
+    case "calc":
+      argv.shift()
+      let result = processCalcInput.getString(argv);
+      twitch_client.say(target, result);
+      break;
+    case "dice":
+      const num = rollDice();
+      twitch_client.say(target, `You rolled a ${num}`);
+      break;
+    case "help":
+      twitch_client.say(target, help.genCalc());
+      break;
+    case "manCalc":
+      twitch_client.say(target, help.genManCalc());
+      break;
+    default:
+      twitch_client.say(target, "invalid command, try again.");
+  }
+}
+
+function onConnectedTwitch (addr, port) {
+  console.log(`* TWITCH BOT ready. Connected to ${addr}:${port}`);
+}
+
+function rollDice () {
+  const sides = 6;
+  return Math.floor(Math.random() * sides) + 1;
+}
+
+
+discord_client.login(discord_token);
+twitch_client.connect();

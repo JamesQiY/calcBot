@@ -28,6 +28,24 @@ function getEmbed(input) {
   return {embeds: [result], files: [sword_image]};
 }
 
+function getString(input){
+  let string = "";
+  const valid = validate(input);
+  if (!valid.check || err.length > 0) { // if the input does not pass the checks
+    err[0] ? string = err[0]: string = "invalid inputs. Please check again.";
+    err = [];
+  } else { // if the input does pass all the checks
+    let attacker = valid.unit.attacker;
+    let defender = valid.unit.defender;
+    let has_crit = valid.unit.crit;
+    let damage_calc = AttackCalc.processAttack(attacker, defender, has_crit);
+    if (has_crit) string = string + "Critical hit! ";
+    string += "Median: " + damage_calc.median + "; " + damage_calc.low + " - " + damage_calc.high + '.';
+    string += "Terrain val = " + defender.terrain;
+  }
+  return string;
+}
+
 function formatCalcEmbed(calc, err=[], valid={check: false}, crit=false){
   // init for embed
   const embed = new MessageEmbed()
@@ -199,3 +217,4 @@ function bolded(string) { return "**" + string + "**"; }
 
 exports.getEmbed = getEmbed;
 exports.validate = validate;
+exports.getString = getString;
