@@ -139,5 +139,15 @@ function rollDice() {
 }
 
 
-discord_client.login(discord_token);
-twitch_client.connect();
+try {
+  discord_client.login(discord_token);
+} catch (error) {
+  console.log("discord login failed");
+  console.log(error);
+}
+try {
+  twitch_client.connect();
+} catch (error) {
+  console.log("twitch login failed");
+  console.log(error);
+}
