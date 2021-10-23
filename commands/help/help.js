@@ -28,7 +28,7 @@ function genManCalc() {
   d += "[a=att_terrain]:", " an optional argument for the attacker's terrain value.\n Terrain values: [-2 to 4]. Unused for now, but used for future implementations. Example: a=1\n"
   d += "[d=][def_terrain]:", " an optional argument for the defender's terrain value.\n Terrain values: [-2 to 4].\n"
   d += "Can be used with the optional 'd=' prefix. \n"
-  d += "If no terrain value is given, defender's terrain value is defaulted to 1\n"
+  d += "If no terrain value is given, defender's terrain value is defaulted to 0\n"
   d += "[c]: optional value for indicating if the attack is a critical hit.\n\n"
   d += "Examples of using the command:", "\n"
   d += "!calc dog soldier   => 100hp dog vs 100hp soldier on terrain val 1. No crit.\n"
@@ -46,7 +46,7 @@ function addManCalc(embed) {
   embed.addField("[a=att_terrain]:", " an optional argument for the attacker's terrain value.\n Terrain values: [-2 to 4]. Unused for now, but used for future implementations. Example: a=1\n")
   embed.addField("[d=][def_terrain]:", " an optional argument for the defender's terrain value.\n Terrain values: [-2 to 4].\n"
     + "Can be used with the optional 'd=' prefix. \n"
-    + "If no terrain value is given, defender's terrain value is defaulted to 1\n")
+    + "If no terrain value is given, defender's terrain value is defaulted to 0\n")
   embed.addField("[c]", "an optional value for indicating if the attack is a critical hit.\n\n")
   embed.addField("Examples of using the command:", "\n"
     + "!calc dog soldier   => 100hp dog vs 100hp soldier on terrain val 1. No crit.\n"
