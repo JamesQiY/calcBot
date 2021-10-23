@@ -10,5 +10,5 @@ Very dangerous (aka buggy)
 - !quote : gives a random quote (used to test)
 
 #### Author
-James Y. (developer). Discord: jams#4819
-Andy Z. (debugger)
+* James Y. (developer). Discord: jams#4819
+* Andy Z. (debugger)
