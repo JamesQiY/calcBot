@@ -99,7 +99,7 @@ function validate(input) {
     let att_terrain_regex = /^(a=)(-[1-9]|[0-9])$/gm;
     let def_terrain_regex = /^(d=)?(-[1-9]|[0-9])$/gm;
     let att_terrain = "0";
-    let def_terrain = "1";
+    let def_terrain = "0";
 
     let terrain_matches = input.filter(parameter => att_terrain_regex.test(parameter));
     if (terrain_matches.length == 1){
