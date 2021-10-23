@@ -6,7 +6,6 @@ const skull_image = new MessageAttachment('images/skull.png');
 
 function genDesc() {
   d = "Available commands (starting with !):\n";
-  d += "**quote**: gives a random quote\n";
   d += "**calc**: calculates wargroove unit damage given inputs\n";
   d += "**manCalc**: additional details for calc\n";
   d += "**help**: this page";

@@ -66,7 +66,7 @@ function onMessageDiscord(message) {
     if (message.content.substring(0, command_symbol.length) == command_symbol) {
       let argv = message.content.trim().split(' ');
       var command = argv[0].substring(command_symbol.length);
-      switch (command) {
+      switch (command.toLowerCase()) {
         case "calc":
           argv.shift()
           let result = processCalcInput.getEmbed(argv);

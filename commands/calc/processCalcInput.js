@@ -139,7 +139,7 @@ function checkUnit(unit, side) {
   const valid_units = Object.keys(Info.matrix);
 
   if (unit.search(/\d/) > 0) {
-    let unit_name = unit.substring(0, unit.search(/\d/));
+    let unit_name = unit.substring(0, unit.search(/\d/)).toLowerCase();
     unit_name = translate(unit_name);
     if (valid_units.includes(unit_name)) {
       let unit_health = unit.substring(unit.search(/\d/), unit.length);
@@ -164,8 +164,8 @@ function checkUnit(unit, side) {
 }
 
 function translate(input_name){
-  let name = input_name;
-  switch(name.toLowerCase()){
+  let name = input_name.toLowerCase();
+  switch(name){
     case 'sword': name = 'soldier'; break;
     case 'treb' : name = 'trebuchet'; break;
     case 'golem' : name = 'giant'; break;
