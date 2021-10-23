@@ -169,14 +169,27 @@ function translate(input_name){
     case 'sword': name = 'soldier'; break;
     case 'treb' : name = 'trebuchet'; break;
     case 'golem' : name = 'giant'; break;
-    case 'knight' : name = 'cavalry'; break;
     case 'spear' : name = 'spearman'; break;
     case 'witch' : name = 'skyrider'; break;
-    case 'harp' || 'harpoon': name = 'harpoonship'; break;
-    case 'merfolk': name = 'amphibian'; break;
+    case 'harpy': name = 'aeronaut'; break;
+    case 'sniper':
     case 'rifle': name = 'rifleman'; break;
-    case 'village' || 'city' : name = 'building'; break;
-    case 'co' || 'com': name = 'commander'; break;
+
+    case 'merman':
+    case 'mermen':
+    case 'merfolk': name = 'amphibian'; break;
+    case 'horse':
+    case 'knight' : name = 'cavalry'; break;
+
+    case 'harp':
+    case 'harpoon': name = 'harpoonship'; break;
+
+    case 'village':
+    case 'vill':
+    case 'city' : name = 'building'; break;
+
+    case 'co':
+    case 'com': name = 'commander'; break;
   }
   return name;
 }
