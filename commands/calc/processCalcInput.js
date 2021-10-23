@@ -175,7 +175,7 @@ function translate(input_name){
     case 'harp' || 'harpoon': name = 'harpoonship'; break;
     case 'merfolk': name = 'amphibian'; break;
     case 'rifle': name = 'rifleman'; break;
-    case 'village': name = 'building'; break;
+    case 'village' || 'city' : name = 'building'; break;
     case 'co' || 'com': name = 'commander'; break;
   }
   return name;
@@ -193,7 +193,12 @@ function processUnit(unit, terrain_string) {
     unit_health = 100;
   }
 
+  // special case for buildings. they always have 0 terrain value
   let unit_terrain = parseInt(terrain_string);
+  if (unit_name == 'building' || unit_name == 'hq'){
+    unit_terrain = 0;
+  }
+  
   return {name: unit_name, health: unit_health, terrain: unit_terrain};
 }
 

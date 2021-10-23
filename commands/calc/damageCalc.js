@@ -38,8 +38,8 @@ function processAttack (attacker, defender, critical=false, weather='sunny', rng
   damage.high = damage.high *  attacker_health * def_multi;
   damage.high = damage.high <= 0 ? 0: damage.high.toFixed(2);
 
-  damage.median = ((power * crit_multi * weather_multi))
-  damage.median = damage.median *  attacker_health * (1 - (defender_health * terrain_multi))
+  damage.median = ((power * crit_multi * weather_multi));
+  damage.median = damage.median *  attacker_health * def_multi;
   damage.median = damage.median <= 0 ? 0: damage.median.toFixed(2);
   return damage;
 }
