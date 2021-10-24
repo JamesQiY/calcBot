@@ -79,6 +79,9 @@ function onMessageDiscord(message) {
         case "help":
           sendMessageDiscord(message, help.getHelpEmbed());
           break;
+        case "dice":
+          sendMessageDiscord(message, "you rolled a " + rollDice());
+          break;
         case "mancalc":
           sendMessageDiscord(message, help.getManEmbed());
           break;
