@@ -66,6 +66,7 @@ function onMessageDiscord(message) {
     if (message.content.substring(0, command_symbol.length) == command_symbol) {
       let argv = message.content.trim().split(' ');
       var command = argv[0].substring(command_symbol.length);
+      console.log(command);
       switch (command.toLowerCase()) {
         case "calc":
           argv.shift()
@@ -78,7 +79,7 @@ function onMessageDiscord(message) {
         case "help":
           sendMessageDiscord(message, help.getHelpEmbed());
           break;
-        case "manCalc":
+        case "mancalc":
           sendMessageDiscord(message, help.getManEmbed());
           break;
         default:
