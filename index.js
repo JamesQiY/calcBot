@@ -76,8 +76,14 @@ function onMessageDiscord(message) {
         case "quote":
           "Quote: " + getQuote().then(quote => message.channel.send(quote));
           break;
+        case "calchelp":
         case "helpcalc":
           sendMessageDiscord(message, command, help.getHelpEmbed());
+          break;
+        case "help":
+          if (argv.length == 2 && argv[1] == 'calc') {
+            sendMessageDiscord(message, command, help.getHelpEmbed());
+          }
           break;
         case "dice":
           sendMessageDiscord(message, command, "you rolled a " + rollDice());
@@ -86,14 +92,14 @@ function onMessageDiscord(message) {
           sendMessageDiscord(message, command, help.getManEmbed());
           break;
       }
-      
+
     }
   } catch (error) {
     console.log(error);
   }
 }
 
-function sendMessageDiscord(message, command="", payload) {
+function sendMessageDiscord(message, command = "", payload) {
   try {
     message.channel.send(payload);
     console.log(`* Discord: Executed ${command} command`);
