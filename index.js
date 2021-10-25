@@ -85,8 +85,6 @@ function onMessageDiscord(message) {
         case "mancalc":
           sendMessageDiscord(message, help.getManEmbed());
           break;
-        default:
-          message.channel.send("invalid command, try again.");
       }
       console.log(`* Discord: Executed ${command} command`);
     }
