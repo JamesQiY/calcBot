@@ -71,31 +71,32 @@ function onMessageDiscord(message) {
         case "calc":
           argv.shift()
           let result = processCalcInput.getEmbed(argv);
-          sendMessageDiscord(message, result);
+          sendMessageDiscord(message, command, result);
           break;
         case "quote":
           "Quote: " + getQuote().then(quote => message.channel.send(quote));
           break;
-        case "help":
-          sendMessageDiscord(message, help.getHelpEmbed());
+        case "helpcalc":
+          sendMessageDiscord(message, command, help.getHelpEmbed());
           break;
         case "dice":
-          sendMessageDiscord(message, "you rolled a " + rollDice());
+          sendMessageDiscord(message, command, "you rolled a " + rollDice());
           break;
         case "mancalc":
-          sendMessageDiscord(message, help.getManEmbed());
+          sendMessageDiscord(message, command, help.getManEmbed());
           break;
       }
-      console.log(`* Discord: Executed ${command} command`);
+      
     }
   } catch (error) {
     console.log(error);
   }
 }
 
-function sendMessageDiscord(message, payload) {
+function sendMessageDiscord(message, command="", payload) {
   try {
     message.channel.send(payload);
+    console.log(`* Discord: Executed ${command} command`);
   } catch (error) {
     console.log(error);
   }
