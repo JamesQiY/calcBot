@@ -277,7 +277,7 @@ function processUnit(unit, terrain_string) {
 
   // special case for buildings. they always have 0 terrain value
   let unit_terrain = parseInt(terrain_string);
-  if (unit_name == 'building' || unit_name == 'hq') {
+  if (unit_name == 'building' || unit_name == 'hq' || unit_name == 'gate') {
     unit_terrain = 0;
   }
 
