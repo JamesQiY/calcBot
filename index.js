@@ -1,3 +1,4 @@
+"use strict"
 const { Client, Intents, MessageEmbed, MessageAttachment } = require("discord.js");
 const tmi = require('tmi.js');
 const fetch = require("node-fetch");
@@ -36,7 +37,7 @@ const opts = {
 };
 const twitch_client = new tmi.client(opts);
 
-// functions 
+// misc functions 
 function getQuote() {
   return fetch("https://zenquotes.io/api/random")
     .then(res => {
@@ -47,6 +48,17 @@ function getQuote() {
     })
 }
 
+function rollDice() {
+  const sides = 6;
+  return Math.floor(Math.random() * sides) + 1;
+}
+
+function flipCoin() {
+  let face = "heads";
+  Math.floor(Math.random() * 2) + 1 == 1 ? face = "tails" : face;
+  return face;
+}
+
 // listeners
 discord_client.on("ready", onConnectedDiscord);
 discord_client.on("messageCreate", onMessageDiscord);
@@ -55,6 +67,7 @@ twitch_client.on('message', onMessageTwitch);
 twitch_client.on('connected', onConnectedTwitch);
 
 
+// listener functions
 function onConnectedDiscord() {
   console.log("DISCORD bot ready: " + discord_client.user.tag);
 }
@@ -149,18 +162,6 @@ function onMessageTwitch(target, context, msg, self) {
 function onConnectedTwitch(addr, port) {
   console.log(`* TWITCH BOT ready. Connected to ${addr}:${port}`);
 }
-
-function rollDice() {
-  const sides = 6;
-  return Math.floor(Math.random() * sides) + 1;
-}
-
-function flipCoin() {
-  let face = "heads";
-  Math.floor(Math.random() * 2) + 1 == 1 ? face = "tails" : face;
-  return face;
-}
-
 
 try {
   discord_client.login(discord_token);

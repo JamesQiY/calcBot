@@ -1,3 +1,4 @@
+"use strict"
 const AttackCalc = require('./damageCalc.js');
 const processInput = require('./processCalcInput.js');
 const Info = require('./info.json');
@@ -51,9 +52,10 @@ function runTest(){
     "dog dragon",
     "balloon soldier",
     "ballista building",
-    "knight hq c"
+    "knight hq c",
+    "treb balloon"
   ]
-
+  let test = "";
   for (test of teststrings){
     const string = test;
     test = test.split(' ');

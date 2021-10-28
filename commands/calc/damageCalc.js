@@ -4,7 +4,7 @@ const Info = require('./info.json');
 // attacker, defender: objects that contain {name: str, health: int, tile: str}
 // critical: t/f representing if the attack is a crit
 // weather: valid inputs are sunny, rainy, and windy
-// rng: auto true, used for later on, does not do anything a the moment
+// rng: auto true, used for later on, does not do anything at the moment
 //
 // output: an object that contains the low and high rolls of the final damage
 
@@ -49,14 +49,28 @@ function processAttack (attacker, defender, critical=false, weather='sunny', rng
 // input: attacker, defender: objects that contain {name: str, health: int, tile: str}
 // output: damage from matrix +5 as int if input valid, else 0
 function getDamageInfo(attacker, defender){
+  let defender_name = equivalent_values(defender.name);
   if (Info.matrix[attacker.name]) {
     //  if its not null and exists in list
-    if (Info.matrix[attacker.name].damage[defender.name])
-      // info json contains vals that are -5 so we add back 5
-      var damage = Info.matrix[attacker.name].damage[defender.name];
-      return damage == null ? damage = 0 : damage + 5;
+    if (Info.matrix[attacker.name].damage[defender_name])
+      var damage = Info.matrix[attacker.name].damage[defender_name];
+      return damage == null ? damage = 0 : damage;
   }
   return 0;
+}
+
+// returns an equivalent damage value in info matrix given a name
+function equivalent_values(name){
+  let eq = name;
+  switch (name){
+    case 'vine': 
+      eq = "building";
+      break;
+    case 'gate':
+      eq = 'hq';
+      break;
+  }
+  return eq;
 }
 
 // returns the float representing the attacker's crit multiplier

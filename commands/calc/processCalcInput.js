@@ -5,9 +5,7 @@ const { MessageEmbed, MessageAttachment } = require("discord.js");
 
 const invalid_att_units = Info.invalid;
 const valid_att_units = Object.keys(Info.matrix).filter(value => !invalid_att_units.includes(value));
-const valid_def_units = Object.keys(Info.matrix);
-
-console.log(valid_att_units, valid_def_units);
+const valid_def_units = Info.unitList;
 
 const calc_color = '#fff545';
 const sword_image = new MessageAttachment('images/sword.png');
@@ -16,7 +14,7 @@ const sword_image = new MessageAttachment('images/sword.png');
 var err = [];
 
 // need to process something like
-// soldier100 soldier50 ta=1 td=2 c=false 
+// soldier100 soldier50 a=1 d=2 c
 // input: an array of parameters as strings
 // output: embed info object and string of the embed info object
 function getInfo(input) {
@@ -40,24 +38,14 @@ function getInfo(input) {
   return { embedObject: { embeds: [result], files: [sword_image] }, str: string };
 }
 
-function getString(input) {
-  let string = "";
-  const valid = validate(input);
-  if (!valid.check || err.length > 0) { // if the input does not pass the checks
-    err[0] ? string = err[0] : string = "invalid inputs. Please check again.";
-    err = [];
-  } else { // if the input does pass all the checks
-    let attacker = valid.unit.attacker;
-    let defender = valid.unit.defender;
-    let has_crit = valid.unit.crit;
-    let damage_calc = AttackCalc.processAttack(attacker, defender, has_crit);
-    if (has_crit) string = string + "Critical hit! ";
-    string += "Median: " + damage_calc.median + "; " + damage_calc.low + " - " + damage_calc.high + '.';
-    string += "Terrain val = " + defender.terrain;
-  }
-  return string;
-}
-
+// given the information of the input process, return the appropriate discord embed object
+// input:
+// calc = object that contains median, low, high damage of the attack
+// err = array of error messages
+// valid = contains the unit and terrain information
+// crit = if the attack is crit or not
+// output:
+// discord embed object;
 function formatCalcEmbed(calc, err = [], valid = { check: false }, crit = false) {
   // init for embed
   const embed = new MessageEmbed()
@@ -94,6 +82,7 @@ function formatCalcEmbed(calc, err = [], valid = { check: false }, crit = false)
 }
 
 // checks if the given input (array of str) is valid
+// input: array of parameters (strings)
 // output: t/f
 function validate(input) {
   let check = true;
@@ -110,8 +99,8 @@ function validate(input) {
     // terrain checks
 
     // regex matches 'a=' or 'd='(option) and then integers between '-2' to '4'
-    let att_terrain_regex = /^(a=)(-[1-9]|[0-9])$/gm;
-    let def_terrain_regex = /^(d=)?(-[1-9]|[0-9])$/gm;
+    let att_terrain_regex = /^(a=)(-\d+|\d+)$/gm;
+    let def_terrain_regex = /^(d=)?(-\d+|\d+)$/gm;
     let att_terrain = "0";
     let def_terrain = "0";
 
@@ -230,6 +219,8 @@ function checkUnitNameHelper(name, side) {
     }
   } else { // defender
     if (!valid_def_units.includes(translated)) {
+      console.log(name);
+      console.log(valid_def_units)
       err.push(side_name + " name is wrong or does not exist");
       check = false
     }
@@ -293,7 +284,8 @@ function processUnit(unit, terrain_string) {
   return { name: unit_name, health: unit_health, terrain: unit_terrain };
 }
 
-
+// check if the given terrain is an int between -2 to 4
+// format of valid terrain can be a single int or 'd=[terrain_value]'
 function checkTerrain(terrain, side) {
   let index = terrain.indexOf('=') + 1;
   terrain = terrain.substring(index);
@@ -314,4 +306,3 @@ function bolded(string) { return "**" + string + "**"; }
 
 exports.getInfo = getInfo;
 exports.validate = validate;
-exports.getString = getString;

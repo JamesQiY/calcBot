@@ -1,9 +1,11 @@
-const { Client, Intents, MessageEmbed, MessageAttachment } = require("discord.js");
+const {MessageEmbed, MessageAttachment } = require("discord.js");
 
 const help_color = '#7fdbfa';
 const man_color = '#ffba59';
 const skull_image = new MessageAttachment('images/skull.png');
 
+
+// generates the string for the description of help
 function genDesc() {
   d = "Available commands (starting with !):\n";
   d += "**calc**: calculates wargroove unit damage given inputs\n";
@@ -12,6 +14,7 @@ function genDesc() {
   return d;
 }
 
+// generates the string for the description of calc
 function genCalc() {
   d = "given attacker name, defender name, their hp, crit, and the defender terrain, this calculates the range of damage that the attack does\n\n";
   d += "Usage: Attacker[hp] Defender[hp] [a=att_terrain] [d=][def_terrain] [c]\n";
@@ -19,6 +22,7 @@ function genCalc() {
   return d;
 }
 
+// generates the string for the description of mancalc
 function genManCalc() {
   d = "";
   d += "Usage:", " Attacker[hp] Defender[hp] [a=att_terrain] [d=][def_terrain] [c]\n"
