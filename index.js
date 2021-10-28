@@ -1,13 +1,16 @@
 const { Client, Intents, MessageEmbed, MessageAttachment } = require("discord.js");
 const tmi = require('tmi.js');
-
 const fetch = require("node-fetch");
 const processCalcInput = require('./commands/calc/processCalcInput');
 const help = require('./commands/help/help');
 require("dotenv").config();
 
 // global vars
-const discord_token = process.env.BOT_TOKEN;
+const debug = false;
+var discord_token = process.env.BOT_TOKEN;
+if (debug){
+  discord_token = process.env.BOT_TOKEN_DEBUG;
+}
 const command_symbol = '!';
 
 
@@ -70,7 +73,7 @@ function onMessageDiscord(message) {
       switch (command.toLowerCase()) {
         case "calc":
           argv.shift()
-          let result = processCalcInput.getEmbed(argv);
+          let result = processCalcInput.getInfo(argv).embedObject;
           sendMessageDiscord(message, command, result);
           break;
         case "quote":
@@ -87,6 +90,9 @@ function onMessageDiscord(message) {
           break;
         case "dice":
           sendMessageDiscord(message, command, "you rolled a " + rollDice());
+          break;
+        case "coin":
+          sendMessageDiscord(message, command, "you flipped a " + flipCoin());
           break;
         case "mancalc":
           sendMessageDiscord(message, command, help.getManEmbed());
@@ -117,12 +123,16 @@ function onMessageTwitch(target, context, msg, self) {
     switch (command) {
       case "calc":
         argv.shift()
-        let result = processCalcInput.getString(argv);
+        let result = processCalcInput.getInfo(argv).str;
         twitch_client.say(target, result);
         break;
       case "dice":
         const num = rollDice();
         twitch_client.say(target, `You rolled a ${num}`);
+        break;
+      case "coin":
+        const face = flipCoin();
+        twitch_client.say(target, `You flipped a ${face}`);
         break;
       case "help":
         twitch_client.say(target, help.genCalc());
@@ -130,8 +140,6 @@ function onMessageTwitch(target, context, msg, self) {
       case "manCalc":
         twitch_client.say(target, help.genManCalc());
         break;
-      default:
-        twitch_client.say(target, "invalid command, try again.");
     }
   } catch (error) {
     console.log(error);
@@ -145,6 +153,12 @@ function onConnectedTwitch(addr, port) {
 function rollDice() {
   const sides = 6;
   return Math.floor(Math.random() * sides) + 1;
+}
+
+function flipCoin() {
+  let face = "heads";
+  Math.floor(Math.random() * 2) + 1 == 1 ? face = "tails" : face;
+  return face;
 }
 
 

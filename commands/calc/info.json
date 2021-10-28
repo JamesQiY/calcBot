@@ -680,5 +680,6 @@
     "none": 0,
     "rainy": 0.8,
     "windy": 1.2
-  }
+  },
+  "invalid": ["building", "crystal", "wagon", "barge", "balloon", "thief", "hq"]
 }

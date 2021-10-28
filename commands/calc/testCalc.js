@@ -4,7 +4,7 @@ const Info = require('./info.json');
 
 function runTest(){
   let attacker = {
-    name: "soldier",
+    name: "dog",
     health: 100,
     terrain: 0,
     crit: 1.5
@@ -20,8 +20,7 @@ function runTest(){
   // test 1
   console.log(AttackCalc.processAttack(attacker, defender, true));
   console.log(AttackCalc.processAttack(attacker, defender, false));
-  console.log(AttackCalc.processAttack({}, defender, false));
-  console.log(AttackCalc.processAttack({}, {}, false));
+
 
   let teststrings = [
     "soldier100 dog100",
@@ -44,13 +43,21 @@ function runTest(){
     "sword dog a=0 d=-1",
     "sword dog a=6 d=1 c",
     "dog25 co15 d=4 a=2 c",
-    "dog soldier"
+    "dog soldier",
+    "dog balloon",
+    "building soldier",
+    "city soldier",
+    "hq soldier",
+    "dog dragon",
+    "balloon soldier",
+    "ballista building",
+    "knight hq c"
   ]
 
   for (test of teststrings){
     const string = test;
     test = test.split(' ');
-    console.log(string, processInput.validate(test));
+    console.log(string, processInput.validate(test).check);
   }
 }
 
