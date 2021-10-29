@@ -5,22 +5,22 @@ const Info = require('./info.json');
 
 function runTest(){
   let attacker = {
-    name: "dog",
+    name: "aeronaut",
     health: 100,
     terrain: 0,
     crit: 1.5
   }
   let defender = {
-    name: "dog",
+    name: "mage",
     health: 100,
-    terrain: 4,
+    terrain: 0,
     crit: 1.5
   }
-  let crit = false;
+  let crit = true;
 
   // test 1
-  console.log(AttackCalc.processAttack(attacker, defender, true));
-  console.log(AttackCalc.processAttack(attacker, defender, false));
+  console.log(AttackCalc.processFull(attacker, defender, true, false));
+  console.log(AttackCalc.processFull(attacker, defender, true, true));
 
 
   let teststrings = [
@@ -59,7 +59,7 @@ function runTest(){
   for (test of teststrings){
     const string = test;
     test = test.split(' ');
-    console.log(string, processInput.validate(test).check);
+    // console.log(string, processInput.validate(test).check);
   }
 }
 

@@ -44,19 +44,59 @@ function processAttack (attacker, defender, critical=false, weather='sunny', rng
   return damage;
 }
 
+function processFull (attacker, defender, att_critical=false ,def_critical=false, weather='sunny', rng=true){
+  let attack = processAttack (attacker, defender, att_critical);
+
+  let defender_copy = defender;
+  let health_reset = defender_copy.health;
+  let counter_low_damage = 0;
+  let counter_high_damage = 0;
+  let counter_median_damage = 0;
+  
+  let def_health_low = defender_copy.health - attack.high;
+  let def_health_high = defender_copy.health - attack.low;
+  let def_health_median = defender_copy.health - attack.median;
+  // calc low
+  if (def_health_low > 0){
+    defender_copy.health = def_health_low;
+    counter_low_damage = Math.max(0, processAttack(defender_copy, attacker, def_critical, weather, rng).low);
+  }
+
+  // calc high
+  defender_copy.health = health_reset;
+  if (def_health_high > 0){
+    defender_copy.health = def_health_high;
+    counter_high_damage = Math.max(0, processAttack(defender_copy, attacker, def_critical, weather, rng).high);
+  }
+
+  // calc median
+  defender_copy.health = health_reset;
+  if (def_health_median > 0){
+    defender_copy.health = def_health_median;
+    counter_median_damage = Math.max(0, processAttack(defender_copy, attacker, def_critical).median);
+  }
+  defender_copy.health = health_reset;
+  let counter = {low : counter_low_damage, high: counter_high_damage, median: counter_median_damage};
+  return {"attack" : attack, "counter": counter};
+}
 
 // returns the integer representing attacker vs defender matrix values
 // input: attacker, defender: objects that contain {name: str, health: int, tile: str}
 // output: damage from matrix +5 as int if input valid, else 0
 function getDamageInfo(attacker, defender){
+  let data = getDamageRaw(attacker,defender)
+  if (data != null) return data;
+  else return 0;
+}
+
+function getDamageRaw(attacker,defender){
   let defender_name = equivalent_values(defender.name);
   if (Info.matrix[attacker.name]) {
     //  if its not null and exists in list
     if (Info.matrix[attacker.name].damage[defender_name])
-      var damage = Info.matrix[attacker.name].damage[defender_name];
-      return damage == null ? damage = 0 : damage;
+      return Info.matrix[attacker.name].damage[defender_name];
   }
-  return 0;
+  return null;
 }
 
 // returns an equivalent damage value in info matrix given a name
@@ -94,3 +134,5 @@ function getWeatherMultiplier(weather){
 }
 
 exports.processAttack = processAttack;
+exports.processFull = processFull;
+exports.getDamageRaw = getDamageRaw;

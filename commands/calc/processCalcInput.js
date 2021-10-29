@@ -28,11 +28,12 @@ function getInfo(input) {
   } else { // if the input does pass all the checks
     let attacker = valid.unit.attacker;
     let defender = valid.unit.defender;
-    let has_crit = valid.unit.crit;
-    let damage_calc = AttackCalc.processAttack(attacker, defender, has_crit);
-    result = formatCalcEmbed(damage_calc, err, valid, has_crit);
-    if (has_crit) string = string + "Critical hit! ";
-    string += "Median: " + damage_calc.median + "; " + damage_calc.low + " - " + damage_calc.high + '.';
+    let att_crit = valid.unit.att_crit;
+    let def_crit = valid.unit.def_crit;
+    let damage_calc = AttackCalc.processFull(attacker, defender, att_crit, def_crit);
+    result = formatCalcEmbed(damage_calc, err, valid, att_crit, def_crit);
+    if (att_crit) string = string + "Critical hit! ";
+    string += "Median: " + damage_calc.attack.median + "; " + damage_calc.attack.low + " - " + damage_calc.attack.high + '.';
     string += "Terrain val = " + defender.terrain;
   }
   return { embedObject: { embeds: [result], files: [sword_image] }, str: string };
@@ -46,7 +47,7 @@ function getInfo(input) {
 // crit = if the attack is crit or not
 // output:
 // discord embed object;
-function formatCalcEmbed(calc, err = [], valid = { check: false }, crit = false) {
+function formatCalcEmbed(calc, err = [], valid = { check: false }, att_crit=false, def_crit=false) {
   // init for embed
   const embed = new MessageEmbed()
     .setColor(calc_color)
@@ -67,16 +68,23 @@ function formatCalcEmbed(calc, err = [], valid = { check: false }, crit = false)
     const attacker = unit.attacker;
     const defender = unit.defender;
     let desc = "Calculated\n";
-    if (crit) desc = desc + "**Critical hit**\n";
     desc += attacker.health + " hp " + attacker.name + " vs ";
-    desc += defender.health + " hp " + defender.name;
-    desc += " on terrain value of " + defender.terrain;
+    desc += defender.health + " hp " + defender.name + "\n";
+    desc += attacker.terrain + " terrain vs "+ defender.terrain + " terrain";
 
     embed.setDescription(desc);
-    let battle = bolded(attacker.name) + " vs " + bolded(defender.name);
-    let battle_damage = "Median: " + bolded(calc.median) + "\n";
-    battle_damage = battle_damage + calc.low + " - " + calc.high;
-    embed.addFields({ name: battle, value: battle_damage });
+
+    let battle = bolded(attacker.name) + (att_crit ? " CRIT" : "") + " attack";
+    let battle_damage = "";
+    battle_damage += "Median: " + bolded(calc.attack.median) + "\n";
+    battle_damage += calc.attack.low + " - " + calc.attack.high;
+    embed.addFields({ name: battle, value: battle_damage, inline: true });
+
+    battle = bolded(defender.name) + (def_crit ? " CRIT" : "") + " counter";
+    battle_damage = "";
+    battle_damage += "Median: " + bolded(calc.counter.median) + "\n";
+    battle_damage += calc.counter.low + " - " + calc.counter.high;
+    embed.addFields({ name: battle, value: battle_damage, inline: true  });
   }
   return embed;
 }
@@ -86,6 +94,8 @@ function formatCalcEmbed(calc, err = [], valid = { check: false }, crit = false)
 // output: t/f
 function validate(input) {
   let check = true;
+  let att_crit = false;
+  let def_crit = false;
   let unit = {};
   // valid command requires at least 2 parameters
   if (input.length >= 2) {
@@ -119,17 +129,22 @@ function validate(input) {
     }
 
     // crit check
-    let crit = false;
-    if (input.includes('c')) crit = true;
+    if (input.includes('c') || input.includes('ac')) att_crit = true;
+    if (input.includes('dc')) def_crit = true;
 
     if (check) {
       unit.attacker = processUnit(attacker, att_terrain);
       unit.defender = processUnit(defender, def_terrain);
-      unit.crit = crit;
+      if (AttackCalc.getDamageRaw(unit.attacker, unit.defender) == null){
+        check = false;
+        err.push("the attacker cannot attack the defender");
+      }
+      unit.att_crit = att_crit;
+      unit.def_crit = def_crit;
     }
   } else {
     check = false;
-    err.push("there are fewer than 3 required arguments (attacker, defender, defender terrain)");
+    err.push("there are fewer than 2 required arguments (attacker, defender)");
   }
   return { check, unit: unit };
 }

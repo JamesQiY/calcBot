@@ -7,7 +7,7 @@ const help = require('./commands/help/help');
 require("dotenv").config();
 
 // global vars
-const debug = false;
+const debug = true;
 var discord_token = process.env.BOT_TOKEN;
 if (debug){
   discord_token = process.env.BOT_TOKEN_DEBUG;
@@ -82,7 +82,6 @@ function onMessageDiscord(message) {
     if (message.content.substring(0, command_symbol.length) == command_symbol) {
       let argv = message.content.trim().split(' ');
       var command = argv[0].substring(command_symbol.length);
-      console.log(command);
       switch (command.toLowerCase()) {
         case "calc":
           argv.shift()
@@ -111,7 +110,6 @@ function onMessageDiscord(message) {
           sendMessageDiscord(message, command, help.getManEmbed());
           break;
       }
-
     }
   } catch (error) {
     console.log(error);
