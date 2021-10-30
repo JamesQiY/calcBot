@@ -1,8 +1,9 @@
+"use strict"
 const AttackCalc = require('./damageCalc.js');
 const Info = require('./info.json');
-const { MessageEmbed, MessageAttachment } = require("discord.js");
+const { MessageEmbed, MessageAttachment, DiscordAPIError } = require("discord.js");
 
-
+// unit lists
 const invalid_att_units = Info.invalid;
 const valid_att_units = Object.keys(Info.matrix).filter(value => !invalid_att_units.includes(value));
 const valid_def_units = Info.unitList;
@@ -10,13 +11,14 @@ const valid_def_units = Info.unitList;
 const calc_color = '#fff545';
 const sword_image = new MessageAttachment('images/sword.png');
 
-// array of strings to keep track of error messages to output
+// err array : array of strings of error messages
 var err = [];
 
-// need to process something like
-// soldier100 soldier50 a=1 d=2 c
-// input: an array of parameters as strings
-// output: embed info object and string of the embed info object
+/**
+ * processes parameters of calc command and returns embed object and string representation
+ * @param {string[]} input 
+ * @returns {{embedObject: MessageEmbed, str: string}}
+ */
 function getInfo(input) {
   const valid = validate(input);
   let result = "";
@@ -39,7 +41,7 @@ function getInfo(input) {
   return { embedObject: { embeds: [result], files: [sword_image] }, str: string };
 }
 
-// given the information of the input process, return the appropriate discord embed object
+// 
 // input:
 // calc = object that contains median, low, high damage of the attack
 // err = array of error messages
@@ -47,6 +49,15 @@ function getInfo(input) {
 // crit = if the attack is crit or not
 // output:
 // discord embed object;
+/**
+ * given the information of the input process, return the appropriate discord embed object
+ * @param {Object} calc damage info object returned from {@link AttackCalc.processFull} function
+ * @param {string[]} err current error array
+ * @param {object} valid processed and cleaned string inputs as objects
+ * @param {boolean} att_crit 
+ * @param {boolean} def_crit 
+ * @returns {MessageEmbed}
+ */
 function formatCalcEmbed(calc, err = [], valid = { check: false }, att_crit=false, def_crit=false) {
   // init for embed
   const embed = new MessageEmbed()
@@ -89,9 +100,11 @@ function formatCalcEmbed(calc, err = [], valid = { check: false }, att_crit=fals
   return embed;
 }
 
-// checks if the given input (array of str) is valid
-// input: array of parameters (strings)
-// output: t/f
+/**
+ * checks if the given input (array of str) is valid and returns cleaned inputs if all are valid
+ * @param {string[]} input array of parameters
+ * @returns {{boolean, object}} object contains the attacker and defender objects
+ */
 function validate(input) {
   let check = true;
   let att_crit = false;
@@ -118,14 +131,14 @@ function validate(input) {
     if (terrain_matches.length == 1) {
       let index = terrain_matches[0].indexOf('=') + 1;
       att_terrain = terrain_matches[0].substring(index);
-      check = check && checkTerrain(att_terrain, "attacker");
+      check = check && checkTerrain(att_terrain, true);
     }
 
     terrain_matches = input.filter(parameter => def_terrain_regex.test(parameter));
     if (terrain_matches.length == 1) {
       let index = terrain_matches[0].indexOf('=') + 1;
       def_terrain = terrain_matches[0].substring(index);
-      check = check && checkTerrain(def_terrain, "defender");
+      check = check && checkTerrain(def_terrain, false);
     }
 
     // crit check
@@ -149,11 +162,12 @@ function validate(input) {
   return { check, unit: unit };
 }
 
-
-// input: 
-// unit: is the str input from user
-// side: true for attacker, false for defender
-// output: null if inputs not valid, else {name: x, health: y}
+/**
+ * checks if the unit given are valid
+ * @param {string} unit_name 
+ * @param {boolean} side true = attacker , false = defender
+ * @returns {boolean}
+ */
 function checkUnit(unit_name, side = true) {
   let side_name = "";
   side ? side_name = "attacker" : side_name = "defender"
@@ -187,35 +201,15 @@ function checkUnit(unit_name, side = true) {
     !side && !checkUnitNameHelper(unit_name, false)? check = false : check;
   }
   return check;
-
-  // if (unit_name.search(/\d/) > 0) {
-  //   let unit_name = unit_name.substring(0, unit_name.search(/\d/)).toLowerCase();
-  //   unit_name = translate(unit_name);
-  //   if (valid_att_units.includes(unit_name)) {
-  //     let unit_health = unit_name.substring(unit_name.search(/\d/), unit_name.length);
-  //     if (!isNaN(unit_health)) {
-  //       if (parseInt(unit_health) >= 1 && parseInt(unit_health) <= 100) {
-  //         // all checks passed, return as an object
-  //         return true;
-  //       }
-  //       err.push(side_name + " health is not between 1-100");
-  //     } else {
-  //       err.push(side_name + " health is not valid");
-  //     }
-  //   } else {
-  //     err.push(side_name + " name is wrong or does not exist");
-  //   }
-  // } else if (valid_att_units.includes(translate(unit_name))) {
-  //   return true;
-  // } else {
-  //   err.push(side_name + " name is wrong or does not exist");
-  // }
-  // return false;
 }
 
-// given unit name and side (true = attacker, false = defender), 
-// return if unit name is valid within the valid lists
 
+/**
+ * helper of {@link checkUnit} function. Check unit is in valid unit lists
+ * @param {string} name 
+ * @param {boolean} side true = attacker , false = defender
+ * @returns {boolean}
+ */
 function checkUnitNameHelper(name, side) {
   let side_name = "";
   side ? side_name = "attacker" : side_name = "defender"
@@ -234,8 +228,6 @@ function checkUnitNameHelper(name, side) {
     }
   } else { // defender
     if (!valid_def_units.includes(translated)) {
-      console.log(name);
-      console.log(valid_def_units)
       err.push(side_name + " name is wrong or does not exist");
       check = false
     }
@@ -244,7 +236,11 @@ function checkUnitNameHelper(name, side) {
 }
 
 
-// translates common unit names to keys that are used in info matrix
+/**
+ * translates common names to names in damage matrix
+ * @param {string} input_name 
+ * @returns {string} alternate name
+ */
 function translate(input_name) {
   let name = input_name.toLowerCase();
   switch (name) {
@@ -277,7 +273,12 @@ function translate(input_name) {
 }
 
 
-// given valid unit string input and its terrain string, return unit object
+/**
+ * given valid unit string input and its terrain string, return unit object
+ * @param {string} unit 
+ * @param {string} terrain_string 
+ * @returns { name: string, health: number, terrain: number}
+ */
 function processUnit(unit, terrain_string) {
   let unit_name = "";
   let unit_health = 0;
@@ -299,20 +300,27 @@ function processUnit(unit, terrain_string) {
   return { name: unit_name, health: unit_health, terrain: unit_terrain };
 }
 
-// check if the given terrain is an int between -2 to 4
-// format of valid terrain can be a single int or 'd=[terrain_value]'
+/**
+ *  check if the given terrain is an int between -2 to 4
+ * @param {*} terrain 
+ * @param {boolean} side true = attacker , false = defender
+ * @returns {boolean}
+ */
 function checkTerrain(terrain, side) {
+  // format of valid terrain can be a single int or 'd=[terrain_value]'
   let index = terrain.indexOf('=') + 1;
   terrain = terrain.substring(index);
+  let side_name = "";
+  side ? side_name = "attacker" : side_name = "defender"
 
   if (!isNaN(terrain)) {
     if (parseInt(terrain) >= -2 && parseInt(terrain) <= 4) {
       return true;
     } else {
-      err.push(side + " terrain is out of range. Usage: -2 to 4");
+      err.push(side_name + " terrain is out of range. Usage: -2 to 4");
     }
   } else {
-    err.push(side + "terrain is invalid. Usage: -2 to 4");
+    err.push(side_name + "terrain is invalid. Usage: -2 to 4");
   }
   return false;
 }
