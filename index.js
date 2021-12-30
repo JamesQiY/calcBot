@@ -151,14 +151,20 @@ function onConnectedTwitch(addr, port) {
 }
 
 try {
-  discord_client.login(discord_token);
+  discord_client.login(discord_token)
+  .catch(console.log('discord login failed'));
 } catch (error) {
   console.log("discord login failed");
   console.log(error);
 }
+
 try {
   twitch_client.connect();
 } catch (error) {
   console.log("twitch login failed");
   console.log(error);
 }
+
+process.on('unhandledRejection', error => {
+	console.error('Unhandled promise rejection:', error);
+});
