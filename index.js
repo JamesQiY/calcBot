@@ -7,7 +7,7 @@ const misc = require(`./commands/misc/misc`);
 require("dotenv").config();
 
 // global vars
-const debug = true;
+const debug = false;
 var discord_token = process.env.BOT_TOKEN;
 if (debug) {
   discord_token = process.env.BOT_TOKEN_DEBUG;
