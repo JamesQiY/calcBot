@@ -7,6 +7,7 @@ const man_color = '#ffba59';
 
 // generates the string for the description of help
 function genDesc() {
+  let d = ''
   d = "Available commands (starting with !):\n";
   d += "**calc**: calculates wargroove unit damage given inputs\n";
   d += "**manCalc**: additional details for calc\n";
@@ -16,6 +17,7 @@ function genDesc() {
 
 // generates the string for the description of calc
 function genCalc() {
+  let d = ''
   d = "given attacker name, defender name, their hp, crit, and the defender terrain, this calculates the range of damage that the attack does\n\n";
   d += "Usage: Attacker[hp] Defender[hp] [a=att_terrain] [d=][def_terrain] [c][ac] [dc]\n";
   return d;

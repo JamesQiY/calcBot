@@ -7,7 +7,7 @@ const misc = require(`./commands/misc/misc`);
 require("dotenv").config();
 
 // global vars
-const debug = false;
+const debug = true;
 var discord_token = process.env.BOT_TOKEN;
 if (debug) {
   discord_token = process.env.BOT_TOKEN_DEBUG;
@@ -123,6 +123,7 @@ function onMessageTwitch(target, context, msg, self) {
     // Remove whitespace from chat message
     let argv = msg.trim().split(' ');
     var command = argv[0].substring(command_symbol.length);
+    console.log(command)
     switch (command) {
       case "calc":
         argv.shift()
@@ -150,21 +151,13 @@ function onConnectedTwitch(addr, port) {
   console.log(`* TWITCH BOT ready. Connected to ${addr}:${port}`);
 }
 
-try {
-  discord_client.login(discord_token)
-  .catch(console.log('discord login failed'));
-} catch (error) {
-  console.log("discord login failed");
-  console.log(error);
-}
 
-try {
-  twitch_client.connect();
-} catch (error) {
-  console.log("twitch login failed");
-  console.log(error);
-}
+twitch_client.connect()
+  .catch(err => console.log(err, 'twitch login failed'));
+
+discord_client.login(discord_token)
+  .catch(console.log('discord login failed'));
 
 process.on('unhandledRejection', error => {
-	console.error('Unhandled promise rejection:', error);
+  console.error('Unhandled promise rejection:', error);
 });
