@@ -123,7 +123,6 @@ function onMessageTwitch(target, context, msg, self) {
     // Remove whitespace from chat message
     let argv = msg.trim().split(' ');
     var command = argv[0].substring(command_symbol.length);
-    console.log(command)
     switch (command) {
       case "calc":
         argv.shift()

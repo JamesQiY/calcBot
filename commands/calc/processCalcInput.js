@@ -34,9 +34,11 @@ function getInfo(input) {
     let def_crit = valid.unit.def_crit;
     let damage_calc = AttackCalc.processFull(attacker, defender, att_crit, def_crit);
     result = formatCalcEmbed(damage_calc, err, valid, att_crit, def_crit);
+
     if (att_crit) string = string + "Critical hit! ";
-    string += "Median: " + damage_calc.attack.median + "; " + damage_calc.attack.low + " - " + damage_calc.attack.high + '.';
-    string += "Terrain val = " + defender.terrain;
+    string += `Attacker: ${damage_calc.attack.median}; ${damage_calc.attack.low} - ${damage_calc.attack.high}. `;
+    string += `Defender: ${damage_calc.counter.median}; ${damage_calc.counter.low} - ${damage_calc.counter.high}. `;
+    string += `Terrain: a-${attacker.terrain} d-${defender.terrain}`;
   }
   return { embedObject: { embeds: [result], files: [sword_image] }, str: string };
 }
